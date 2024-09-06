@@ -13,11 +13,9 @@ static float     vert_buf[BUFFER_SIZE *  8];
 static byte      color_buf[BUFFER_SIZE * 16];
 static unsigned  index_buf[BUFFER_SIZE *  6];
 
-static int width  = 800;
-static int height = 600;
 static int buf_idx;
 
-static struct fenster window;
+static struct fenster window = (struct fenster){.title="A window", .width=800, .height=600};
 
 void *r_window(void) {
   return &window;
@@ -25,7 +23,7 @@ void *r_window(void) {
 
 void r_init(void) {
   /* init SDL window */
-  window.buf = malloc(width * height * sizeof(*window.buf));
+  window.buf = malloc(window.width * window.height * sizeof(*window.buf));
   r_clear(mu_color(0, 0, 0, 255));
   fenster_open(&window);
 
@@ -145,7 +143,7 @@ uint32_t r_color(mu_Color clr) {
 
 void r_clear(mu_Color clr) {
   flush();
-  for (int i = 0; i < width * height; i++) {
+  for (int i = 0; i < window.width * window.height; i++) {
     window.buf[i] = r_color(clr);
   }
 }
