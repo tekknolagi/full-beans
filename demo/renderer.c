@@ -34,6 +34,8 @@ void r_init(void) {
 static void flush(void) {
   if (buf_idx == 0) { return; }
 
+  // TODO(kartik): draw things based on texture, vertex, color and index
+
   buf_idx = 0;
 }
 
