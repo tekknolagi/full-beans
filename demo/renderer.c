@@ -1,4 +1,5 @@
 #include "fenster.h"
+#include<stdio.h>
 #include <assert.h>
 #include <stdbool.h>
 #include "renderer.h"
@@ -8,8 +9,8 @@
 
 typedef uint8_t byte;
 
-static float     tex_buf[BUFFER_SIZE *  8];
-static float     vert_buf[BUFFER_SIZE *  8];
+static mu_Rect tex_buf[BUFFER_SIZE];
+static mu_Rect vert_buf[BUFFER_SIZE];
 static byte      color_buf[BUFFER_SIZE * 4];
 
 static int buf_idx;
@@ -31,50 +32,53 @@ void r_init(void) {
   /* init texture */
 }
 
+static inline bool within(int c, int lo, int hi) {
+  return c >= lo && c < hi;
+}
+
+static inline bool within_rect(mu_Rect rect, int x, int y) {
+  return within(x, rect.x, rect.x+rect.w)
+        && within(y, rect.y, rect.y+rect.h);
+}
+
 
 static void flush(void) {
   if (buf_idx == 0) { return; }
 
-  // TODO(kartik): draw things based on texture, vertex, color
+  // HERE: draw things based on texture, vertex, color
+  for (int i = 0; i < BUFFER_SIZE; i++) {
+    mu_Rect* vert = &vert_buf[i];
+    mu_Rect* tex = &tex_buf[i];
+    int color = color_buf[i];  // red
+    color = color << 8;
+    color = color & color_buf[i+1];  // green
+    color = color << 8;
+    color = color & color_buf[i+2];  // blue
+    // ignore alpha channel
+    // draw
+    for (int y = vert->y; y < vert->y+vert->h; y++) {
+      for (int x = vert->x; x < vert->x+vert->w; x++) {
+        if (within_rect(clip_rect, x, y)) {
+          fenster_pixel(&window, x, y) = color;
+        }
+      }
+    }
+  }
 
   buf_idx = 0;
 }
 
 
-static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color) {
+static void push_quad(mu_Rect vert, mu_Rect tex, mu_Color color) {
   if (buf_idx == BUFFER_SIZE) { flush(); }
 
-  int texvert_idx = buf_idx *  8;
-  int   color_idx = buf_idx *  4;
-  int element_idx = buf_idx *  4;
-  buf_idx++;
+  int color_idx = buf_idx *  4;
 
-  /* update texture buffer */
-  float x = src.x / (float) ATLAS_WIDTH;
-  float y = src.y / (float) ATLAS_HEIGHT;
-  float w = src.w / (float) ATLAS_WIDTH;
-  float h = src.h / (float) ATLAS_HEIGHT;
-  tex_buf[texvert_idx + 0] = x;
-  tex_buf[texvert_idx + 1] = y;
-  tex_buf[texvert_idx + 2] = x + w;
-  tex_buf[texvert_idx + 3] = y;
-  tex_buf[texvert_idx + 4] = x;
-  tex_buf[texvert_idx + 5] = y + h;
-  tex_buf[texvert_idx + 6] = x + w;
-  tex_buf[texvert_idx + 7] = y + h;
-
-  /* update vertex buffer */
-  vert_buf[texvert_idx + 0] = dst.x;
-  vert_buf[texvert_idx + 1] = dst.y;
-  vert_buf[texvert_idx + 2] = dst.x + dst.w;
-  vert_buf[texvert_idx + 3] = dst.y;
-  vert_buf[texvert_idx + 4] = dst.x;
-  vert_buf[texvert_idx + 5] = dst.y + dst.h;
-  vert_buf[texvert_idx + 6] = dst.x + dst.w;
-  vert_buf[texvert_idx + 7] = dst.y + dst.h;
-
-  /* update color buffer */
+  memcpy(&tex_buf[buf_idx], &tex, sizeof(mu_Rect));
+  memcpy(&vert_buf[buf_idx], &vert, sizeof(mu_Rect));
   memcpy(color_buf + color_idx, &color, 4);
+
+  buf_idx++;
 }
 
 
