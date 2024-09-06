@@ -5,10 +5,12 @@
 
 #define BUFFER_SIZE 16384
 
-static GLfloat   tex_buf[BUFFER_SIZE *  8];
-static GLfloat  vert_buf[BUFFER_SIZE *  8];
-static GLubyte color_buf[BUFFER_SIZE * 16];
-static GLuint  index_buf[BUFFER_SIZE *  6];
+typedef uint8_t byte;
+
+static float     tex_buf[BUFFER_SIZE *  8];
+static float     vert_buf[BUFFER_SIZE *  8];
+static byte      color_buf[BUFFER_SIZE * 16];
+static unsigned  index_buf[BUFFER_SIZE *  6];
 
 static int width  = 800;
 static int height = 600;
