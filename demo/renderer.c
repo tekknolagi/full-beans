@@ -10,7 +10,7 @@
 typedef uint8_t byte;
 
 static mu_Rect tex_buf[BUFFER_SIZE];
-static mu_Rect vert_buf[BUFFER_SIZE];
+static mu_Rect src_buf[BUFFER_SIZE];
 static byte      color_buf[BUFFER_SIZE * 4];
 
 static int buf_idx;
@@ -41,25 +41,53 @@ static inline bool within_rect(mu_Rect rect, int x, int y) {
         && within(y, rect.y, rect.y+rect.h);
 }
 
+static inline bool same_size(const mu_Rect* a, const mu_Rect* b) {
+  return a->w == b->w && a->h == b->h;
+}
+
+static inline byte texture_color(const mu_Rect* tex, int x, int y) {
+  assert(x < tex->w);
+  x = x + tex->x;
+  assert(y < tex->h);
+  y = y + tex->y;
+  return atlas_texture[y*ATLAS_WIDTH + x];
+}
+
+static inline int color(byte r, byte g, byte b) {  // ignore alpha channel for now
+  int result = r;
+  result = result << 8;
+  result = result & g;
+  result = result << 8;
+  result = result & b;
+  return result;
+}
+
+static inline int greyscale(byte c) {
+  return color(c, c, c);
+}
+
 
 static void flush(void) {
   if (buf_idx == 0) { return; }
 
-  // HERE: draw things based on texture, vertex, color
+  // draw things based on texture, vertex, color
   for (int i = 0; i < BUFFER_SIZE; i++) {
-    mu_Rect* vert = &vert_buf[i];
+    mu_Rect* src = &src_buf[i];
     mu_Rect* tex = &tex_buf[i];
-    int color = color_buf[i];  // red
-    color = color << 8;
-    color = color & color_buf[i+1];  // green
-    color = color << 8;
-    color = color & color_buf[i+2];  // blue
-    // ignore alpha channel
+    int c = color(color_buf[i], color_buf[i+1], color_buf[i+2]);
     // draw
-    for (int y = vert->y; y < vert->y+vert->h; y++) {
-      for (int x = vert->x; x < vert->x+vert->w; x++) {
+    for (int y = src->y; y < src->y+src->h; y++) {
+      for (int x = src->x; x < src->x+src->w; x++) {
         if (within_rect(clip_rect, x, y)) {
-          fenster_pixel(&window, x, y) = color;
+          // hacky but sufficient for us
+          if (same_size(src, tex)) {
+            // read color from texture
+            fenster_pixel(&window, x, y) = greyscale(texture_color(tex, x-src->x, y-src->y));
+          }
+          else {
+            // use color from operation
+//?             fenster_pixel(&window, x, y) = c;
+          }
         }
       }
     }
@@ -69,13 +97,13 @@ static void flush(void) {
 }
 
 
-static void push_quad(mu_Rect vert, mu_Rect tex, mu_Color color) {
+static void push_quad(mu_Rect src, mu_Rect tex, mu_Color color) {
   if (buf_idx == BUFFER_SIZE) { flush(); }
 
   int color_idx = buf_idx *  4;
 
   memcpy(&tex_buf[buf_idx], &tex, sizeof(mu_Rect));
-  memcpy(&vert_buf[buf_idx], &vert, sizeof(mu_Rect));
+  memcpy(&src_buf[buf_idx], &src, sizeof(mu_Rect));
   memcpy(color_buf + color_idx, &color, 4);
 
   buf_idx++;
