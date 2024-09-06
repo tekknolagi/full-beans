@@ -16,19 +16,17 @@ static int width  = 800;
 static int height = 600;
 static int buf_idx;
 
-static struct fenster *window;
-
+static struct fenster window;
 
 void *r_window(void) {
-  return window;
+  return &window;
 }
 
 void r_init(void) {
   /* init SDL window */
-  window = SDL_CreateWindow(
-    NULL, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-    width, height, SDL_WINDOW_OPENGL);
-  SDL_GL_CreateContext(window);
+  window.buf = malloc(width * height * sizeof(*window.buf));
+  r_clear();
+  fenster_open(&window)
 
   /* init gl */
   glEnable(GL_BLEND);
@@ -176,11 +174,15 @@ void r_set_clip_rect(mu_Rect rect) {
   glScissor(rect.x, height - (rect.y + rect.h), rect.w, rect.h);
 }
 
+uint32_t r_color(mu_Color clr) {
+  return ((uint32_t)clr.a << 24) | ((uint32_t)clr.b << 16) | ((uint32_t)clr.g << 8) | clr.r;
+}
 
 void r_clear(mu_Color clr) {
   flush();
-  glClearColor(clr.r / 255., clr.g / 255., clr.b / 255., clr.a / 255.);
-  glClear(GL_COLOR_BUFFER_BIT);
+  for (int i = 0; i < width * height; i++) {
+    window.buf[i] = r_color(clr);
+  }
 }
 
 
