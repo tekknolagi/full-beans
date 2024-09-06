@@ -28,7 +28,6 @@ void r_init(void) {
   fenster_open(&window);
 
   /* init texture */
-  // TODO(max): figure out what fonts mean in fenster
 }
 
 
