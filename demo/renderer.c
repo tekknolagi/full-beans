@@ -10,7 +10,7 @@ typedef uint8_t byte;
 
 static float     tex_buf[BUFFER_SIZE *  8];
 static float     vert_buf[BUFFER_SIZE *  8];
-static byte      color_buf[BUFFER_SIZE * 16];
+static byte      color_buf[BUFFER_SIZE * 4];
 
 static int buf_idx;
 
@@ -45,7 +45,7 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color) {
   if (buf_idx == BUFFER_SIZE) { flush(); }
 
   int texvert_idx = buf_idx *  8;
-  int   color_idx = buf_idx * 16;
+  int   color_idx = buf_idx *  4;
   int element_idx = buf_idx *  4;
   buf_idx++;
 
@@ -74,10 +74,7 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color) {
   vert_buf[texvert_idx + 7] = dst.y + dst.h;
 
   /* update color buffer */
-  memcpy(color_buf + color_idx +  0, &color, 4);
-  memcpy(color_buf + color_idx +  4, &color, 4);
-  memcpy(color_buf + color_idx +  8, &color, 4);
-  memcpy(color_buf + color_idx + 12, &color, 4);
+  memcpy(color_buf + color_idx, &color, 4);
 }
 
 
