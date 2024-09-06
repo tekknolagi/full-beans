@@ -186,5 +186,5 @@ void r_clear(mu_Color clr) {
 
 void r_present(void) {
   flush();
-  SDL_GL_SwapWindow(window);
+  fenster_loop(window);
 }
