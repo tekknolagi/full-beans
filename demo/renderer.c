@@ -17,6 +17,8 @@ static int buf_idx;
 
 static struct fenster window = (struct fenster){.title="A window", .width=800, .height=600};
 
+static mu_Rect clip_rect;
+
 void *r_window(void) {
   return &window;
 }
@@ -134,8 +136,7 @@ int r_get_text_height(void) {
 
 void r_set_clip_rect(mu_Rect rect) {
   flush();
-  assert(false); // TODO(max): glScissor
-  // glScissor(rect.x, height - (rect.y + rect.h), rect.w, rect.h);
+  memcpy(&clip_rect, &rect, sizeof(mu_Rect));
 }
 
 uint32_t r_color(mu_Color clr) {
