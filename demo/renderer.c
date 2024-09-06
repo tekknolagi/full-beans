@@ -11,7 +11,6 @@ typedef uint8_t byte;
 static float     tex_buf[BUFFER_SIZE *  8];
 static float     vert_buf[BUFFER_SIZE *  8];
 static byte      color_buf[BUFFER_SIZE * 16];
-static unsigned  index_buf[BUFFER_SIZE *  6];
 
 static int buf_idx;
 
@@ -36,7 +35,7 @@ void r_init(void) {
 static void flush(void) {
   if (buf_idx == 0) { return; }
 
-  // TODO(kartik): draw things based on texture, vertex, color and index
+  // TODO(kartik): draw things based on texture, vertex, color
 
   buf_idx = 0;
 }
@@ -48,7 +47,6 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color) {
   int texvert_idx = buf_idx *  8;
   int   color_idx = buf_idx * 16;
   int element_idx = buf_idx *  4;
-  int   index_idx = buf_idx *  6;
   buf_idx++;
 
   /* update texture buffer */
@@ -80,14 +78,6 @@ static void push_quad(mu_Rect dst, mu_Rect src, mu_Color color) {
   memcpy(color_buf + color_idx +  4, &color, 4);
   memcpy(color_buf + color_idx +  8, &color, 4);
   memcpy(color_buf + color_idx + 12, &color, 4);
-
-  /* update index buffer */
-  index_buf[index_idx + 0] = element_idx + 0;
-  index_buf[index_idx + 1] = element_idx + 1;
-  index_buf[index_idx + 2] = element_idx + 2;
-  index_buf[index_idx + 3] = element_idx + 2;
-  index_buf[index_idx + 4] = element_idx + 3;
-  index_buf[index_idx + 5] = element_idx + 1;
 }
 
 
