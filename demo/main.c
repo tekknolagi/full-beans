@@ -1,7 +1,9 @@
-#include <stdio.h>
-#include "renderer.h"
+#define FENSTER_HEADER
 #include "fenster.h"
+#include "renderer.h"
 #include "microui.h"
+
+#include <stdio.h>
 
 
 static  char logbuf[64000];
@@ -223,21 +225,22 @@ int main(int argc, char **argv) {
   ctx->text_width = text_width;
   ctx->text_height = text_height;
 
+  // TODO(max): current time and sleep to maintain fps
   int fps = 60;
 
   /* main loop */
   for (;;) {
-    if (f->mouse) {
-      mu_input_mousedown(ctx, f->x, f->y, MU_MOUSE_LEFT);
+    if (window->mouse) {
+      mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
     } else {
       // TODO(max): catch mouse up from state change
     }
     // TODO(max): maybe only do this on state change
-    mu_input_mousemove(ctx, f->x, f->y);
+    mu_input_mousemove(ctx, window->x, window->y);
     // TODO(max): scroll
-    if (f->keys[0x1b]) { break; }  // esc
+    if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
-      if (f->keys[i]) { mu_input_keydown(ctx, i); }
+      if (window->keys[i]) { mu_input_keydown(ctx, i); }
       else { } // TODO(max): catch key up from state change
       // TODO(max): mod
     }

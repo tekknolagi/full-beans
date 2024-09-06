@@ -1,5 +1,6 @@
-#include <assert.h>
 #include "fenster.h"
+#include <assert.h>
+#include <stdbool.h>
 #include "renderer.h"
 #include "atlas.inl"
 
@@ -25,53 +26,16 @@ void *r_window(void) {
 void r_init(void) {
   /* init SDL window */
   window.buf = malloc(width * height * sizeof(*window.buf));
-  r_clear();
-  fenster_open(&window)
-
-  /* init gl */
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_CULL_FACE);
-  glDisable(GL_DEPTH_TEST);
-  glEnable(GL_SCISSOR_TEST);
-  glEnable(GL_TEXTURE_2D);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  r_clear(mu_color(0, 0, 0, 255));
+  fenster_open(&window);
 
   /* init texture */
-  GLuint id;
-  glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, ATLAS_WIDTH, ATLAS_HEIGHT, 0,
-    GL_ALPHA, GL_UNSIGNED_BYTE, atlas_texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  assert(glGetError() == 0);
+  // TODO(max): figure out what fonts mean in fenster
 }
 
 
 static void flush(void) {
   if (buf_idx == 0) { return; }
-
-  glViewport(0, 0, width, height);
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0.0f, width, height, 0.0f, -1.0f, +1.0f);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-
-  glTexCoordPointer(2, GL_FLOAT, 0, tex_buf);
-  glVertexPointer(2, GL_FLOAT, 0, vert_buf);
-  glColorPointer(4, GL_UNSIGNED_BYTE, 0, color_buf);
-  glDrawElements(GL_TRIANGLES, buf_idx * 6, GL_UNSIGNED_INT, index_buf);
-
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
 
   buf_idx = 0;
 }
@@ -171,7 +135,8 @@ int r_get_text_height(void) {
 
 void r_set_clip_rect(mu_Rect rect) {
   flush();
-  glScissor(rect.x, height - (rect.y + rect.h), rect.w, rect.h);
+  assert(false); // TODO(max): glScissor
+  // glScissor(rect.x, height - (rect.y + rect.h), rect.w, rect.h);
 }
 
 uint32_t r_color(mu_Color clr) {
@@ -188,5 +153,5 @@ void r_clear(mu_Color clr) {
 
 void r_present(void) {
   flush();
-  fenster_loop(window);
+  fenster_loop(&window);
 }

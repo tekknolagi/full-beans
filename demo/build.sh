@@ -12,5 +12,5 @@ fi
 
 CFLAGS="-I../ -Wall -std=c11 -pedantic $GLFLAG -lm -O2 -g"
 
-gcc main.c renderer.c ../src/microui.c $CFLAGS
+gcc main.c renderer.c ../microui.c $CFLAGS
 
