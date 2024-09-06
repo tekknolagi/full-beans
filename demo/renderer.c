@@ -1,6 +1,5 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
 #include <assert.h>
+#include "fenster.h"
 #include "renderer.h"
 #include "atlas.inl"
 
@@ -15,8 +14,12 @@ static int width  = 800;
 static int height = 600;
 static int buf_idx;
 
-static SDL_Window *window;
+static struct fenster *window;
 
+
+void *r_window(void) {
+  return window;
+}
 
 void r_init(void) {
   /* init SDL window */
