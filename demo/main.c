@@ -246,7 +246,6 @@ int main(int argc, char **argv) {
       mousex = window->x;
       mousey = window->y;
     }
-    mu_input_mousemove(ctx, window->x, window->y);
     // TODO(max): scroll
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
