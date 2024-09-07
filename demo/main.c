@@ -246,6 +246,14 @@ int main(int argc, char **argv) {
       if (window->keys[i] && !keys[i]) {
         if (' ' <= i  &&  i <= '~') {
           char text[2] = {i, 0};
+          if (isalpha(i)) {
+            if ((window->mod&2) == 0) {
+              text[0] = tolower(i);
+            }
+          }
+          else {
+            // TODO(kartik): depends on keyboard layout
+          }
           mu_input_text(ctx, text);
         }
         mu_input_keydown(ctx, i);
