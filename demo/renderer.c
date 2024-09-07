@@ -83,7 +83,7 @@ static void flush(void) {
           if (same_size(src, tex)) {
             // read color from texture
             byte tc = texture_color(tex, x-src->x, y-src->y);
-            fenster_pixel(&window, x, y) = greyscale(tc);
+            fenster_pixel(&window, x, y) |= greyscale(tc);
           }
           else {
             // use color from operation
