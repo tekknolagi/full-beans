@@ -227,21 +227,30 @@ int main(int argc, char **argv) {
 
   // TODO(max): current time and sleep to maintain fps
   int fps = 60;
+  int keys[256] = {0};
+  int mousex = 0, mousey = 0;
+  int mouseclick = 0;
 
   /* main loop */
   for (;;) {
     if (window->mouse) {
       mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
-    } else {
-      // TODO(max): catch mouse up from state change
+      mouseclick = 1;
+    } else if (mouseclick) {
+      mu_input_mouseup(ctx, window->x, window->y, MU_MOUSE_LEFT);
+      mouseclick = 0;
     }
-    // TODO(max): maybe only do this on state change
+    if (window->x != mousex || window->y != mousey) {
+      mu_input_mousemove(ctx, window->x, window->y);
+      mousex = window->x;
+      mousey = window->y;
+    }
     mu_input_mousemove(ctx, window->x, window->y);
     // TODO(max): scroll
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
-      if (window->keys[i]) { mu_input_keydown(ctx, i); }
-      else { } // TODO(max): catch key up from state change
+      if (window->keys[i]) { mu_input_keydown(ctx, i); keys[i] = 1; }
+      else if (keys[i]) { mu_input_keyup(ctx, i); keys[i] = 0; }
       // TODO(max): mod
     }
 
