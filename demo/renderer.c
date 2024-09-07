@@ -1,5 +1,4 @@
 #include "fenster.h"
-#include<stdio.h>
 #include <assert.h>
 #include <stdbool.h>
 #include "renderer.h"
