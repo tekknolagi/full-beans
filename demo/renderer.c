@@ -68,14 +68,6 @@ static inline int greyscale(byte c) {
   return color(c, c, c);
 }
 
-int min(int a, int b) {
-  return a < b ? a : b;
-}
-
-int max(int a, int b) {
-  return a > b ? a : b;
-}
-
 static void flush(void) {
   if (buf_idx == 0) { return; }
 
@@ -85,10 +77,10 @@ static void flush(void) {
     mu_Rect* tex = &tex_buf[i];
     int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
     // draw
-    int ystart = max(0, max(src->y, clip_rect.y));
-    int yend = min(window.height, min(src->y+src->h, clip_rect.y+clip_rect.h));
-    int xstart = max(0, max(src->x, clip_rect.x));
-    int xend = min(window.width, min(src->x+src->w, clip_rect.x+clip_rect.w));
+    int ystart = mu_max(0, mu_max(src->y, clip_rect.y));
+    int yend = mu_min(window.height, mu_min(src->y+src->h, clip_rect.y+clip_rect.h));
+    int xstart = mu_max(0, mu_max(src->x, clip_rect.x));
+    int xend = mu_min(window.width, mu_min(src->x+src->w, clip_rect.x+clip_rect.w));
     for (int y = ystart; y < yend; y++) {
       for (int x = xstart; x < xend; x++) {
         assert(within_rect(*src, x, y));
