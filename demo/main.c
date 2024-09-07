@@ -225,7 +225,6 @@ int main(int argc, char **argv) {
   ctx->text_width = text_width;
   ctx->text_height = text_height;
 
-  // TODO(max): current time and sleep to maintain fps
   int fps = 60;
   int keys[256] = {0};
   int64_t last_keys[256] = {0};
