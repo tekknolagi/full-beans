@@ -101,12 +101,10 @@ enum {
   MU_KEY_SHIFT        = (1 << 0),
   MU_KEY_CTRL         = (1 << 1),
   MU_KEY_ALT          = (1 << 2),
+  MU_KEY_BACKSPACE    = (1 << 3),
+  MU_KEY_RETURN       = (1 << 4)
 };
 
-enum {
-  MU_KEY_BACKSPACE    = 8,
-  MU_KEY_RETURN       = 10,
-};
 
 typedef struct mu_Context mu_Context;
 typedef unsigned mu_Id;

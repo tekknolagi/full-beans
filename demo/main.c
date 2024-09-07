@@ -257,6 +257,7 @@ int main(int argc, char **argv) {
           mu_input_text(ctx, text);
         }
         else {
+          if (i == '\n') i = MU_KEY_RETURN;  // hack for microui
           mu_input_keydown(ctx, i);
         }
         keys[i] = 1;
