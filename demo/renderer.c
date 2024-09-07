@@ -74,7 +74,7 @@ static void flush(void) {
   for (int i = 0; i < BUFFER_SIZE; i++) {
     mu_Rect* src = &src_buf[i];
     mu_Rect* tex = &tex_buf[i];
-    int c = color(color_buf[i], color_buf[i+1], color_buf[i+2]);
+    int c = color(color_buf[i*4], color_buf[i*4+1], color_buf[i*4+2]);
     // draw
     for (int y = src->y; y < src->y+src->h; y++) {
       for (int x = src->x; x < src->x+src->w; x++) {
