@@ -256,7 +256,9 @@ int main(int argc, char **argv) {
           }
           mu_input_text(ctx, text);
         }
-        mu_input_keydown(ctx, i);
+        else {
+          mu_input_keydown(ctx, i);
+        }
         keys[i] = 1;
       }
       else if (!window->keys[i] && keys[i]) {
