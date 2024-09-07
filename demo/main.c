@@ -1,10 +1,10 @@
-#define FENSTER_HEADER
-#include "fenster.h"
 #include "renderer.h"
 #include "microui.h"
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 
 
 static  char logbuf[64000];
@@ -222,7 +222,6 @@ int key_map[256] = {
 
 int main(int argc, char **argv) {
   r_init();
-  struct fenster *window = (struct fenster *)r_window();
 
   /* init microui */
   mu_Context *ctx = malloc(sizeof(mu_Context));
@@ -231,12 +230,11 @@ int main(int argc, char **argv) {
   ctx->text_height = text_height;
 
   int fps = 60;
-  int keys_down[256] = {0};
   int mousex = 0, mousey = 0;
 
   /* main loop */
   for (;;) {
-    int64_t before = fenster_time();
+    int64_t before = r_get_time();
     if (r_mouse_moved(&mousex, &mousey)) {
       mu_input_mousemove(ctx, mousex, mousey);
     }
@@ -246,16 +244,16 @@ int main(int argc, char **argv) {
       mu_input_mouseup(ctx, mousex, mousey, MU_MOUSE_LEFT);
     }
     // TODO(max): scroll
-    if (window->keys[0x1b]) { break; }  // esc
+    if (r_key_down(0x1b)) { break; }  // esc
     for (int i = 0; i < 256; i++) {
       int special = key_map[i];
-      if (window->keys[i] && !keys_down[i]) {
+      if (r_key_down(i)) {
         if (special) {
           mu_input_keydown(ctx, special);
         } else if (' ' <= i  &&  i <= '~') {
           char text[2] = {i, 0};
           if (isalpha(i)) {
-            if ((window->mod&2) == 0) {
+            if (!r_shift_pressed()) {
               text[0] = tolower(i);
             }
           }
@@ -264,14 +262,11 @@ int main(int argc, char **argv) {
           }
           mu_input_text(ctx, text);
         }
-        keys_down[i] = 1;
-      }
-      else if (!window->keys[i] && keys_down[i]) {
+      } else if (r_key_up(i)) {
         if (special) {
           mu_input_keyup(ctx, special);
         }
         // no key_up for mu_input_text
-        keys_down[i] = 0;
       }
       // TODO(max): mod
     }
@@ -291,12 +286,12 @@ int main(int argc, char **argv) {
       }
     }
     r_present();
-    int64_t after = fenster_time();
+    int64_t after = r_get_time();
     int64_t paint_time_ms = after - before;
     int64_t frame_budget_ms = 1000 / fps;
     int64_t sleep_time_ms = frame_budget_ms - paint_time_ms;
     if (sleep_time_ms > 0) {
-      fenster_sleep(sleep_time_ms);
+      r_sleep(sleep_time_ms);
     }
   }
 
