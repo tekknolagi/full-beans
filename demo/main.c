@@ -215,6 +215,11 @@ static int text_height(mu_Font font) {
   return r_get_text_height();
 }
 
+int key_map[256] = {
+  ['\n'] = MU_KEY_RETURN,
+  ['\b'] = MU_KEY_BACKSPACE,
+};
+
 int main(int argc, char **argv) {
   r_init();
   struct fenster *window = (struct fenster *)r_window();
@@ -243,8 +248,11 @@ int main(int argc, char **argv) {
     // TODO(max): scroll
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
+      int special = key_map[i];
       if (window->keys[i] && !keys_down[i]) {
-        if (' ' <= i  &&  i <= '~') {
+        if (special) {
+          mu_input_keydown(ctx, special);
+        } else if (' ' <= i  &&  i <= '~') {
           char text[2] = {i, 0};
           if (isalpha(i)) {
             if ((window->mod&2) == 0) {
@@ -256,20 +264,13 @@ int main(int argc, char **argv) {
           }
           mu_input_text(ctx, text);
         }
-        else {
-          if (i == '\n') mu_input_keydown(ctx, MU_KEY_RETURN);  // hack for microui
-          else mu_input_keydown(ctx, i);
-        }
         keys_down[i] = 1;
       }
       else if (!window->keys[i] && keys_down[i]) {
-        if (' ' <= i  &&  i <= '~') {
-          // no key_up for mu_input_text
+        if (special) {
+          mu_input_keyup(ctx, special);
         }
-        else {
-          if (i == '\n') mu_input_keyup(ctx, MU_KEY_RETURN);  // hack for microui
-          else mu_input_keyup(ctx, i);
-        }
+        // no key_up for mu_input_text
         keys_down[i] = 0;
       }
       // TODO(max): mod
