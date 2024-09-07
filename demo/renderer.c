@@ -159,11 +159,11 @@ int r_get_text_height(void) {
 
 void r_set_clip_rect(mu_Rect rect) {
   flush();
-  int y0 = mu_max(0, rect.y);
-  int y1 = mu_min(window.height, rect.y+rect.h);
-  int x0 = mu_max(0, rect.x);
-  int x1 = mu_min(window.width, rect.x+rect.w);
-  clip_rect = mu_rect(x0, y0, x1-x0, y1-y0);
+  int ystart = mu_max(0, rect.y);
+  int yend = mu_min(window.height, rect.y+rect.h);
+  int xstart = mu_max(0, rect.x);
+  int xend = mu_min(window.width, rect.x+rect.w);
+  clip_rect = mu_rect(xstart, ystart, xend-xstart, yend-ystart);
 }
 
 uint32_t r_color(mu_Color clr) {
