@@ -244,6 +244,10 @@ int main(int argc, char **argv) {
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
       if (window->keys[i] && !keys[i]) {
+        if (' ' <= i  &&  i <= '~') {
+          char text[2] = {i, 0};
+          mu_input_text(ctx, text);
+        }
         mu_input_keydown(ctx, i);
         keys[i] = 1;
       }
