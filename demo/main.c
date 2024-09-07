@@ -235,6 +235,7 @@ int main(int argc, char **argv) {
 
   /* main loop */
   for (;;) {
+    int64_t before = fenster_time();
     if (window->mouse && !mouseclick) {
       mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
       mouseclick = 1;
@@ -276,6 +277,13 @@ int main(int argc, char **argv) {
       }
     }
     r_present();
+    int64_t after = fenster_time();
+    int64_t paint_time_ms = after - before;
+    int64_t frame_budget_ms = 1000 / fps;
+    int64_t sleep_time_ms = frame_budget_ms - paint_time_ms;
+    if (sleep_time_ms > 0) {
+      fenster_sleep(sleep_time_ms);
+    }
   }
 
   return 0;
