@@ -55,12 +55,12 @@ static inline byte texture_color(const mu_Rect* tex, int x, int y) {
   return atlas_texture[y*ATLAS_WIDTH + x];
 }
 
-static inline uint32_t color(byte r, byte g, byte b) {  // ignore alpha channel for now
-  return (uint32_t)r << 16 | (uint32_t)g << 8 | b;
+static inline uint32_t r_color(mu_Color clr) {
+  return ((uint32_t)clr.a << 24) | ((uint32_t)clr.r << 16) | ((uint32_t)clr.g << 8) | clr.b;
 }
 
 static inline int greyscale(byte c) {
-  return color(c, c, c);
+  return r_color(mu_color(c, c, c, 255));
 }
 
 static void flush(void) {
@@ -85,7 +85,7 @@ static void flush(void) {
         }
       }
     } else {
-      uint32_t c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
+      uint32_t c = r_color(color_buf[i]);
       for (int y = ystart; y < yend; y++) {
         for (int x = xstart; x < xend; x++) {
           assert(within_rect(*src, x, y));
@@ -162,10 +162,6 @@ void r_set_clip_rect(mu_Rect rect) {
   int xstart = mu_max(0, rect.x);
   int xend = mu_min(window.width, rect.x+rect.w);
   clip_rect = mu_rect(xstart, ystart, xend-xstart, yend-ystart);
-}
-
-uint32_t r_color(mu_Color clr) {
-  return ((uint32_t)clr.a << 24) | ((uint32_t)clr.b << 16) | ((uint32_t)clr.g << 8) | clr.r;
 }
 
 void r_clear(mu_Color clr) {
