@@ -15,7 +15,7 @@ static mu_Color color_buf[BUFFER_SIZE];
 
 static int buf_idx;
 
-static struct fenster window = (struct fenster){.title="A window", .width=800, .height=600};
+static struct fenster window = {.title="A window", .width=800, .height=600};
 
 static mu_Rect clip_rect;
 
