@@ -15,13 +15,11 @@ void r_clear(mu_Color color);
 void r_present(void);
 // Can only be checked once per frame; side-effecting.
  int r_mouse_down(void);
-// Can only be checked once per frame; side-effecting.
  int r_mouse_up(void);
 // Can only be checked once per frame; side-effecting.
  int r_mouse_moved(int *x, int *y);
 // Can only be checked once per key per frame; side-effecting.
  int r_key_down(int key);
-// Can only be checked once per key per frame; side-effecting.
  int r_key_up(int key);
  int r_ctrl_pressed(void);
  int r_shift_pressed(void);

@@ -19,8 +19,6 @@ static struct fenster window = {.title="A window", .width=800, .height=600};
 
 static mu_Rect clip_rect;
 
-int mousex = 0, mousey = 0, mouseclick = 0;
-
 void r_init(void) {
   /* init SDL window */
   window.buf = malloc(window.width * window.height * sizeof(*window.buf));
@@ -175,25 +173,24 @@ void r_present(void) {
 
 
 int r_mouse_down(void) {
-  if (window.mouse && !mouseclick) {
-    mouseclick = 1;
+  if (window.mouse == 1) {
+    window.mouse++;
     return 1;
   }
   return 0;
 }
 
 int r_mouse_up(void) {
-  if (!window.mouse && mouseclick) {
-    mouseclick = 0;
+  if (window.mouse < 1) {
     return 1;
   }
   return 0;
 }
 
-int r_mouse_moved(int *new_mousex, int *new_mousey) {
-  if (window.x != mousex || window.y != mousey) {
-    *new_mousex = window.x;
-    *new_mousey = window.y;
+int r_mouse_moved(int *mousex, int *mousey) {
+  if (window.x != *mousex || window.y != *mousey) {
+    *mousex = window.x;
+    *mousey = window.y;
     return 1;
   }
   return 0;
