@@ -13,6 +13,12 @@ void r_draw_icon(int id, mu_Rect rect, mu_Color color);
 void r_set_clip_rect(mu_Rect rect);
 void r_clear(mu_Color color);
 void r_present(void);
+// Can only be checked once per frame; side-effecting.
+ int r_mouse_down(void);
+// Can only be checked once per frame; side-effecting.
+ int r_mouse_up(void);
+// Can only be checked once per frame; side-effecting.
+ int r_mouse_moved(int *x, int *y);
 
 #endif
 

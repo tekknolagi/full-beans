@@ -19,6 +19,8 @@ static struct fenster window = (struct fenster){.title="A window", .width=800, .
 
 static mu_Rect clip_rect;
 
+int mousex = 0, mousey = 0, mouseclick = 0;
+
 void *r_window(void) {
   return &window;
 }
@@ -172,4 +174,30 @@ void r_clear(mu_Color clr) {
 void r_present(void) {
   flush();
   fenster_loop(&window);
+}
+
+
+int r_mouse_down(void) {
+  if (window.mouse && !mouseclick) {
+    mouseclick = 1;
+    return 1;
+  }
+  return 0;
+}
+
+int r_mouse_up(void) {
+  if (!window.mouse && mouseclick) {
+    mouseclick = 0;
+    return 1;
+  }
+  return 0;
+}
+
+int r_mouse_moved(int *new_mousex, int *new_mousey) {
+  if (window.x != mousex || window.y != mousey) {
+    *new_mousex = window.x;
+    *new_mousey = window.y;
+    return 1;
+  }
+  return 0;
 }
