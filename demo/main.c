@@ -215,11 +215,6 @@ static int text_height(mu_Font font) {
   return r_get_text_height();
 }
 
-int key_map[256] = {
-  ['\n'] = MU_KEY_RETURN,
-  ['\b'] = MU_KEY_BACKSPACE,
-};
-
 int main(int argc, char **argv) {
   r_init();
 
@@ -245,12 +240,13 @@ int main(int argc, char **argv) {
     }
     // TODO(max): scroll
     if (r_key_down(0x1b)) { break; }  // esc
+    if (r_key_down('\n')) { mu_input_keydown(ctx, MU_KEY_RETURN); }
+    else if (r_key_up('\n')) { mu_input_keyup(ctx, MU_KEY_RETURN); }
+    if (r_key_down('\b')) { mu_input_keydown(ctx, MU_KEY_BACKSPACE); }
+    else if (r_key_up('\b')) { mu_input_keyup(ctx, MU_KEY_BACKSPACE); }
     for (int i = 0; i < 256; i++) {
-      int special = key_map[i];
       if (r_key_down(i)) {
-        if (special) {
-          mu_input_keydown(ctx, special);
-        } else if (' ' <= i  &&  i <= '~') {
+        if (' ' <= i  &&  i <= '~') {
           char text[2] = {i, 0};
           if (isalpha(i)) {
             if (!r_shift_pressed()) {
@@ -262,12 +258,10 @@ int main(int argc, char **argv) {
           }
           mu_input_text(ctx, text);
         }
-      } else if (r_key_up(i)) {
-        if (special) {
-          mu_input_keyup(ctx, special);
-        }
-        // no key_up for mu_input_text
+        continue;
       }
+      // Need to register event if it has been released
+      r_key_up(i);
       // TODO(max): mod
     }
 
