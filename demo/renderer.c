@@ -21,8 +21,6 @@ static mu_Rect clip_rect;
 
 int mousex = 0, mousey = 0, mouseclick = 0;
 
-int key_down[256] = {0};
-
 void r_init(void) {
   /* init SDL window */
   window.buf = malloc(window.width * window.height * sizeof(*window.buf));
@@ -208,16 +206,15 @@ int r_shift_pressed(void) { return window.mod & 2; }
 int r_alt_pressed(void) { return window.mod & 4; }
 
 int r_key_down(int key) {
-  if (window.keys[key] && !key_down[key]) {
-    key_down[key] = 1;
+  if (window.keys[key] == 1) {
+    window.keys[key]++;
     return 1;
   }
   return 0;
 }
 
 int r_key_up(int key) {
-  if (!window.keys[key] && key_down[key]) {
-    key_down[key] = 0;
+  if (window.keys[key] < 1) {
     return 1;
   }
   return 0;
