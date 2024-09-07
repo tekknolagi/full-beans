@@ -55,13 +55,8 @@ static inline byte texture_color(const mu_Rect* tex, int x, int y) {
   return atlas_texture[y*ATLAS_WIDTH + x];
 }
 
-static inline int color(byte r, byte g, byte b) {  // ignore alpha channel for now
-  int result = r;
-  result = result << 8;
-  result = result | g;
-  result = result << 8;
-  result = result | b;
-  return result;
+static inline uint32_t color(byte r, byte g, byte b) {  // ignore alpha channel for now
+  return (uint32_t)r << 16 | (uint32_t)g << 8 | b;
 }
 
 static inline int greyscale(byte c) {
@@ -90,7 +85,7 @@ static void flush(void) {
         }
       }
     } else {
-      int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
+      uint32_t c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
       for (int y = ystart; y < yend; y++) {
         for (int x = xstart; x < xend; x++) {
           assert(within_rect(*src, x, y));
