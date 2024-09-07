@@ -234,6 +234,7 @@ int main(int argc, char **argv) {
   /* main loop */
   for (;;) {
     if (window->mouse) {
+      // TODO(max): debounce
       mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
       mouseclick = 1;
     } else if (mouseclick) {
