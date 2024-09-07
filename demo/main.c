@@ -227,7 +227,6 @@ int main(int argc, char **argv) {
 
   int fps = 60;
   int keys[256] = {0};
-  int64_t last_keys[256] = {0};
   int mousex = 0, mousey = 0;
 
   /* main loop */
