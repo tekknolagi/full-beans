@@ -56,9 +56,9 @@ static inline byte texture_color(const mu_Rect* tex, int x, int y) {
 static inline int color(byte r, byte g, byte b) {  // ignore alpha channel for now
   int result = r;
   result = result << 8;
-  result = result & g;
+  result = result | g;
   result = result << 8;
-  result = result & b;
+  result = result | b;
   return result;
 }
 
@@ -82,11 +82,12 @@ static void flush(void) {
           // hacky but sufficient for us
           if (same_size(src, tex)) {
             // read color from texture
-            fenster_pixel(&window, x, y) = greyscale(texture_color(tex, x-src->x, y-src->y));
+            byte tc = texture_color(tex, x-src->x, y-src->y);
+            fenster_pixel(&window, x, y) = greyscale(tc);
           }
           else {
             // use color from operation
-//?             fenster_pixel(&window, x, y) = c;
+            fenster_pixel(&window, x, y) = c;
           }
         }
       }
