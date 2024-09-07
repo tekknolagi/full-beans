@@ -226,7 +226,7 @@ int main(int argc, char **argv) {
   ctx->text_height = text_height;
 
   int fps = 60;
-  int keys[256] = {0};
+  int keys_down[256] = {0};
   int mousex = 0, mousey = 0;
 
   /* main loop */
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
     // TODO(max): scroll
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
-      if (window->keys[i] && !keys[i]) {
+      if (window->keys[i] && !keys_down[i]) {
         if (' ' <= i  &&  i <= '~') {
           char text[2] = {i, 0};
           if (isalpha(i)) {
@@ -260,9 +260,9 @@ int main(int argc, char **argv) {
           if (i == '\n') mu_input_keydown(ctx, MU_KEY_RETURN);  // hack for microui
           else mu_input_keydown(ctx, i);
         }
-        keys[i] = 1;
+        keys_down[i] = 1;
       }
-      else if (!window->keys[i] && keys[i]) {
+      else if (!window->keys[i] && keys_down[i]) {
         if (' ' <= i  &&  i <= '~') {
           // no key_up for mu_input_text
         }
@@ -270,7 +270,7 @@ int main(int argc, char **argv) {
           if (i == '\n') mu_input_keyup(ctx, MU_KEY_RETURN);  // hack for microui
           else mu_input_keyup(ctx, i);
         }
-        keys[i] = 0;
+        keys_down[i] = 0;
       }
       // TODO(max): mod
     }
