@@ -71,7 +71,7 @@ static void flush(void) {
   if (buf_idx == 0) { return; }
 
   // draw things based on texture, vertex, color
-  for (int i = 0; i < BUFFER_SIZE; i++) {
+  for (int i = 0; i < buf_idx; i++) {
     mu_Rect* src = &src_buf[i];
     mu_Rect* tex = &tex_buf[i];
     int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
