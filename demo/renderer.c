@@ -75,23 +75,28 @@ static void flush(void) {
   for (int i = 0; i < buf_idx; i++) {
     mu_Rect* src = &src_buf[i];
     mu_Rect* tex = &tex_buf[i];
-    int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
     // draw
     int ystart = mu_max(src->y, clip_rect.y);
     int yend = mu_min(src->y+src->h, clip_rect.y+clip_rect.h);
     int xstart = mu_max(src->x, clip_rect.x);
     int xend = mu_min(src->x+src->w, clip_rect.x+clip_rect.w);
-    for (int y = ystart; y < yend; y++) {
-      for (int x = xstart; x < xend; x++) {
-        assert(within_rect(*src, x, y));
-        assert(within_rect(clip_rect, x, y));
-        // hacky but sufficient for us
-        if (same_size(src, tex)) {
+    // hacky but sufficient for us
+    if (same_size(src, tex)) {
+      for (int y = ystart; y < yend; y++) {
+        for (int x = xstart; x < xend; x++) {
+          assert(within_rect(*src, x, y));
+          assert(within_rect(clip_rect, x, y));
           // read color from texture
           byte tc = texture_color(tex, x-src->x, y-src->y);
           fenster_pixel(&window, x, y) |= greyscale(tc);
         }
-        else {
+      }
+    } else {
+      int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
+      for (int y = ystart; y < yend; y++) {
+        for (int x = xstart; x < xend; x++) {
+          assert(within_rect(*src, x, y));
+          assert(within_rect(clip_rect, x, y));
           // use color from operation
           fenster_pixel(&window, x, y) = c;
         }
