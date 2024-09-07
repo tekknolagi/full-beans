@@ -156,7 +156,7 @@ int r_get_text_height(void) {
 
 void r_set_clip_rect(mu_Rect rect) {
   flush();
-  memcpy(&clip_rect, &rect, sizeof(mu_Rect));
+  clip_rect = rect;
 }
 
 uint32_t r_color(mu_Color clr) {
