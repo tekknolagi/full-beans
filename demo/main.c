@@ -249,6 +249,7 @@ int main(int argc, char **argv) {
     // TODO(max): scroll
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
+      // TODO(max): debounce
       if (window->keys[i]) { mu_input_keydown(ctx, i); keys[i] = 1; }
       else if (keys[i]) { mu_input_keyup(ctx, i); keys[i] = 0; }
       // TODO(max): mod
