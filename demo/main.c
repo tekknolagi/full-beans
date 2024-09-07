@@ -238,6 +238,7 @@ int main(int argc, char **argv) {
   // TODO(max): current time and sleep to maintain fps
   int fps = 60;
   int keys[256] = {0};
+  int64_t last_keys[256] = {0};
   int mousex = 0, mousey = 0;
   int mouseclick = 0;
   int64_t last_mouseclick = 0;
@@ -262,7 +263,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < 256; i++) {
       // TODO(max): debounce
       char text[2] = {i, 0};
-      if (window->keys[i]) { mu_input_text(ctx, text); keys[i] = 1; }
+      if (debounce(window->keys[i], &last_keys[i])) { mu_input_text(ctx, text); keys[i] = 1; }
       // else if (keys[i]) { mu_input_keyup(ctx, i); keys[i] = 0; }
       // TODO(max): mod
     }
