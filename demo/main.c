@@ -214,6 +214,16 @@ static int text_height(mu_Font font) {
   return r_get_text_height();
 }
 
+int debounce(int state, int64_t *last) {
+  if (!state) { return 0; }
+  int64_t debounce_ms = 100;
+  int64_t time = fenster_time();
+  if (time - *last > debounce_ms) {
+    *last = time;
+    return 1;
+  }
+  return 0;
+}
 
 int main(int argc, char **argv) {
   r_init();
@@ -232,15 +242,12 @@ int main(int argc, char **argv) {
   int mouseclick = 0;
   int64_t last_mouseclick = 0;
 
-  int64_t debounce_ms = 100;
-
   /* main loop */
   for (;;) {
-    if (window->mouse && fenster_time() - last_mouseclick > debounce_ms) {
+    if (debounce(window->mouse, &last_mouseclick)) {
       // TODO(max): debounce
       mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
       mouseclick = 1;
-      last_mouseclick = fenster_time();
     } else if (mouseclick) {
       mu_input_mouseup(ctx, window->x, window->y, MU_MOUSE_LEFT);
       mouseclick = 0;
