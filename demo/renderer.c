@@ -85,10 +85,10 @@ static void flush(void) {
     mu_Rect* tex = &tex_buf[i];
     int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
     // draw
-    int ystart = max(src->y, clip_rect.y);
-    int yend = min(src->y+src->h, clip_rect.y+clip_rect.h);
-    int xstart = max(src->x, clip_rect.x);
-    int xend = min(src->x+src->w, clip_rect.x+clip_rect.w);
+    int ystart = max(0, max(src->y, clip_rect.y));
+    int yend = min(window.height, min(src->y+src->h, clip_rect.y+clip_rect.h));
+    int xstart = max(0, max(src->x, clip_rect.x));
+    int xend = min(window.width, min(src->x+src->w, clip_rect.x+clip_rect.w));
     for (int y = ystart; y < yend; y++) {
       for (int x = xstart; x < xend; x++) {
         assert(within_rect(*src, x, y));
