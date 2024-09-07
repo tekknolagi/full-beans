@@ -257,14 +257,19 @@ int main(int argc, char **argv) {
           mu_input_text(ctx, text);
         }
         else {
-          if (i == '\n') i = MU_KEY_RETURN;  // hack for microui
-          mu_input_keydown(ctx, i);
+          if (i == '\n') mu_input_keydown(ctx, MU_KEY_RETURN);  // hack for microui
+          else mu_input_keydown(ctx, i);
         }
         keys[i] = 1;
       }
       else if (!window->keys[i] && keys[i]) {
-        if (i == '\n') i = MU_KEY_RETURN;  // hack for microui
-        mu_input_keyup(ctx, i);
+        if (' ' <= i  &&  i <= '~') {
+          // no key_up for mu_input_text
+        }
+        else {
+          if (i == '\n') mu_input_keyup(ctx, MU_KEY_RETURN);  // hack for microui
+          else mu_input_keyup(ctx, i);
+        }
         keys[i] = 0;
       }
       // TODO(max): mod
