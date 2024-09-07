@@ -263,6 +263,7 @@ int main(int argc, char **argv) {
         keys[i] = 1;
       }
       else if (!window->keys[i] && keys[i]) {
+        if (i == '\n') i = MU_KEY_RETURN;  // hack for microui
         mu_input_keyup(ctx, i);
         keys[i] = 0;
       }
