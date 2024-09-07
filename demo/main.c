@@ -262,9 +262,21 @@ int main(int argc, char **argv) {
     if (window->keys[0x1b]) { break; }  // esc
     for (int i = 0; i < 256; i++) {
       // TODO(max): debounce
-      char text[2] = {i, 0};
-      if (debounce(window->keys[i], &last_keys[i])) { mu_input_text(ctx, text); keys[i] = 1; }
-      // else if (keys[i]) { mu_input_keyup(ctx, i); keys[i] = 0; }
+      if (debounce(window->keys[i], &last_keys[i])) {
+        if (' ' <= i && i <= '~') {
+          // if not shift key, lowercase
+          char c = (window->mod & 2) ? toupper(i) : tolower(i);
+          char text[2] = {c, 0};
+          mu_input_text(ctx, text);
+        } else {
+          mu_input_keydown(ctx, i);
+        }
+        keys[i] = 1;
+      }
+      else if (keys[i]) {
+        mu_input_keyup(ctx, i);
+        keys[i] = 0;
+      }
       // TODO(max): mod
     }
 
