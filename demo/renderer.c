@@ -77,10 +77,10 @@ static void flush(void) {
     mu_Rect* tex = &tex_buf[i];
     int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
     // draw
-    int ystart = mu_max(0, mu_max(src->y, clip_rect.y));
-    int yend = mu_min(window.height, mu_min(src->y+src->h, clip_rect.y+clip_rect.h));
-    int xstart = mu_max(0, mu_max(src->x, clip_rect.x));
-    int xend = mu_min(window.width, mu_min(src->x+src->w, clip_rect.x+clip_rect.w));
+    int ystart = mu_max(src->y, clip_rect.y);
+    int yend = mu_min(src->y+src->h, clip_rect.y+clip_rect.h);
+    int xstart = mu_max(src->x, clip_rect.x);
+    int xend = mu_min(src->x+src->w, clip_rect.x+clip_rect.w);
     for (int y = ystart; y < yend; y++) {
       for (int x = xstart; x < xend; x++) {
         assert(within_rect(*src, x, y));
@@ -159,7 +159,11 @@ int r_get_text_height(void) {
 
 void r_set_clip_rect(mu_Rect rect) {
   flush();
-  clip_rect = rect;
+  int y0 = mu_max(0, rect.y);
+  int y1 = mu_min(window.height, rect.y+rect.h);
+  int x0 = mu_max(0, rect.x);
+  int x1 = mu_min(window.width, rect.x+rect.w);
+  clip_rect = mu_rect(x0, y0, x1-x0, y1-y0);
 }
 
 uint32_t r_color(mu_Color clr) {
