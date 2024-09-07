@@ -229,18 +229,18 @@ int main(int argc, char **argv) {
   int fps = 60;
   int keys[256] = {0};
   int64_t last_keys[256] = {0};
+  int mousex = 0, mousey = 0;
 
   /* main loop */
   for (;;) {
     int64_t before = fenster_time();
-    if (r_mouse_down()) {
-      mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
-    } else if (r_mouse_up()) {
-      mu_input_mouseup(ctx, window->x, window->y, MU_MOUSE_LEFT);
+    if (r_mouse_moved(&mousex, &mousey)) {
+      mu_input_mousemove(ctx, mousex, mousey);
     }
-    int new_mousex, new_mousey;
-    if (r_mouse_moved(&new_mousex, &new_mousey)) {
-      mu_input_mousemove(ctx, new_mousex, new_mousey);
+    if (r_mouse_down()) {
+      mu_input_mousedown(ctx, mousex, mousey, MU_MOUSE_LEFT);
+    } else if (r_mouse_up()) {
+      mu_input_mouseup(ctx, mousex, mousey, MU_MOUSE_LEFT);
     }
     // TODO(max): scroll
     if (window->keys[0x1b]) { break; }  // esc
