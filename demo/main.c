@@ -260,8 +260,6 @@ int main(int argc, char **argv) {
         }
         continue;
       }
-      // Need to register event if it has been released
-      r_key_up(i);
       // TODO(max): mod
     }
 
