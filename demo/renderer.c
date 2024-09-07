@@ -69,8 +69,6 @@ static inline int greyscale(byte c) {
 }
 
 static void flush(void) {
-  if (buf_idx == 0) { return; }
-
   // draw things based on texture, vertex, color
   for (int i = 0; i < buf_idx; i++) {
     mu_Rect* src = &src_buf[i];
