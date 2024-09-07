@@ -104,9 +104,9 @@ static void flush(void) {
 static void push_quad(mu_Rect src, mu_Rect tex, mu_Color color) {
   if (buf_idx == BUFFER_SIZE) { flush(); }
 
-  memcpy(&tex_buf[buf_idx], &tex, sizeof(mu_Rect));
-  memcpy(&src_buf[buf_idx], &src, sizeof(mu_Rect));
-  memcpy(&color_buf[buf_idx], &color, sizeof(mu_Color));
+  tex_buf[buf_idx] = tex;
+  src_buf[buf_idx] = src;
+  color_buf[buf_idx] = color;
 
   buf_idx++;
 }
