@@ -230,13 +230,17 @@ int main(int argc, char **argv) {
   int keys[256] = {0};
   int mousex = 0, mousey = 0;
   int mouseclick = 0;
+  int64_t last_mouseclick = 0;
+
+  int64_t debounce_ms = 100;
 
   /* main loop */
   for (;;) {
-    if (window->mouse) {
+    if (window->mouse && fenster_time() - last_mouseclick > debounce_ms) {
       // TODO(max): debounce
       mu_input_mousedown(ctx, window->x, window->y, MU_MOUSE_LEFT);
       mouseclick = 1;
+      last_mouseclick = fenster_time();
     } else if (mouseclick) {
       mu_input_mouseup(ctx, window->x, window->y, MU_MOUSE_LEFT);
       mouseclick = 0;
