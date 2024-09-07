@@ -53,8 +53,21 @@ static inline uint32_t r_color(mu_Color clr) {
   return ((uint32_t)clr.a << 24) | ((uint32_t)clr.r << 16) | ((uint32_t)clr.g << 8) | clr.b;
 }
 
+mu_Color mu_color_argb(uint32_t clr) {
+  return mu_color((clr >> 16) & 0xff, (clr >> 8) & 0xff, clr & 0xff, (clr >> 24) & 0xff);
+}
+
 static inline int greyscale(byte c) {
   return r_color(mu_color(c, c, c, 255));
+}
+
+
+static inline mu_Color blend_pixel(mu_Color dst, mu_Color src) {
+  int ia = 0xff - src.a;
+  dst.r = ((src.r * src.a) + (dst.r * ia)) >> 8;
+  dst.g = ((src.g * src.a) + (dst.g * ia)) >> 8;
+  dst.b = ((src.b * src.a) + (dst.b * ia)) >> 8;
+  return dst;
 }
 
 static void flush(void) {
@@ -79,13 +92,15 @@ static void flush(void) {
         }
       }
     } else {
-      uint32_t c = r_color(color_buf[i]);
+      mu_Color new_color = color_buf[i];
       for (int y = ystart; y < yend; y++) {
         for (int x = xstart; x < xend; x++) {
           assert(within_rect(*src, x, y));
           assert(within_rect(clip_rect, x, y));
-          // use color from operation
-          fenster_pixel(&window, x, y) = c;
+          // blend color from operation
+          mu_Color existing_color = mu_color_argb(fenster_pixel(&window, x, y));
+          mu_Color result = blend_pixel(existing_color, new_color);
+          fenster_pixel(&window, x, y) = r_color(result);
         }
       }
     }
