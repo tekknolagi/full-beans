@@ -11,7 +11,7 @@ typedef uint8_t byte;
 
 static mu_Rect tex_buf[BUFFER_SIZE];
 static mu_Rect src_buf[BUFFER_SIZE];
-static byte      color_buf[BUFFER_SIZE * 4];
+static mu_Color color_buf[BUFFER_SIZE];
 
 static int buf_idx;
 
@@ -74,7 +74,7 @@ static void flush(void) {
   for (int i = 0; i < BUFFER_SIZE; i++) {
     mu_Rect* src = &src_buf[i];
     mu_Rect* tex = &tex_buf[i];
-    int c = color(color_buf[i*4], color_buf[i*4+1], color_buf[i*4+2]);
+    int c = color(color_buf[i].r, color_buf[i].g, color_buf[i].b);
     // draw
     for (int y = src->y; y < src->y+src->h; y++) {
       for (int x = src->x; x < src->x+src->w; x++) {
@@ -101,11 +101,9 @@ static void flush(void) {
 static void push_quad(mu_Rect src, mu_Rect tex, mu_Color color) {
   if (buf_idx == BUFFER_SIZE) { flush(); }
 
-  int color_idx = buf_idx *  4;
-
   memcpy(&tex_buf[buf_idx], &tex, sizeof(mu_Rect));
   memcpy(&src_buf[buf_idx], &src, sizeof(mu_Rect));
-  memcpy(color_buf + color_idx, &color, 4);
+  memcpy(&color_buf[buf_idx], &color, sizeof(mu_Color));
 
   buf_idx++;
 }
