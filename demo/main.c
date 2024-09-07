@@ -4,6 +4,7 @@
 #include "microui.h"
 
 #include <stdio.h>
+#include <ctype.h>
 
 
 static  char logbuf[64000];
