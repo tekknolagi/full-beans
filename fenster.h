@@ -42,6 +42,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <time.h>
+#include <termios.h>
 #else
 #define _DEFAULT_SOURCE 1
 #include <X11/XKBlib.h>
@@ -301,7 +302,40 @@ FENSTER_API int fenster_loop(struct fenster *f) {
   return 0;
 }
 #elif defined(USE_LINUX_FB)
+struct termios orig_termios;
+int disableRawMode() {
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) {
+    perror("tcsetattr");
+    return -1;
+  }
+  return 0;
+}
+void disableRawModeYolo() {
+  disableRawMode();
+}
+int enableRawMode() {
+  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) {
+    perror("tcgetattr");
+    return -1;
+  }
+  atexit(disableRawModeYolo);
+  struct termios raw = orig_termios;
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  raw.c_oflag &= ~(OPOST);
+  raw.c_cflag |= (CS8);
+  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  raw.c_cc[VMIN] = 0;
+  raw.c_cc[VTIME] = 1;
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
+    perror("tcsetattr");
+    return -1;
+  }
+  return 0;
+}
 FENSTER_API int fenster_open(struct fenster *f) {
+  if (enableRawMode() == -1) {
+    return -1;
+  }
   f->fbstate.fd = open("/dev/fb0", O_RDWR);
   if (f->fbstate.fd < 0) {
     perror("Error: cannot open framebuffer device");
@@ -344,12 +378,25 @@ FENSTER_API int fenster_open(struct fenster *f) {
 }
 FENSTER_API int fenster_loop(struct fenster *f) {
   memcpy(f->fbstate.screen, f->buf, f->fbstate.fb_data_size);
+  char buf[8] = {0};
+  int nread;
+  if ((nread = read(STDIN_FILENO, &buf, 1)) == -1) {
+    perror("read");
+    return -1;
+  }
+  for (int i = 0; i < 256; i++) {
+    f->keys[i] = 0;
+  }
+  for (int i = 0; i < nread; i++) {
+    f->keys[buf[i]] = 1;
+  }
   return 0;
 }
 FENSTER_API void fenster_close(struct fenster *f) {
   memcpy(f->fbstate.screen, f->fbstate.prev, f->fbstate.fb_data_size);
   munmap(f->fbstate.screen, f->fbstate.fb_data_size);
   close(f->fbstate.fd);
+  disableRawMode();
 }
 #else
 // clang-format off
