@@ -86,14 +86,8 @@ static void flush(void) {
           assert(within_rect(*src, x, y));
           assert(within_rect(clip_rect, x, y));
           // read color from texture
-      mu_Color existing_color = color_buf[i];
-          // mu_Color existing_color = mu_color_argb(fenster_pixel(&window, x, y));
           byte tc = texture_color(tex, x-src->x, y-src->y);
-          existing_color.r *= tc/255.0;
-          existing_color.g *= tc/255.0;
-          existing_color.b *= tc/255.0;
-          // mu_Color result = blend_pixel(existing_color, mu_color(0, 0, 0, tc));
-          fenster_pixel(&window, x, y) = r_color(existing_color);
+          fenster_pixel(&window, x, y) |= greyscale(tc);
         }
       }
     } else {
