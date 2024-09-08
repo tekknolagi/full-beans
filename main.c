@@ -286,6 +286,7 @@ int main(int argc, char **argv) {
       r_sleep(sleep_time_ms);
     }
   }
+  r_deinit();
 
   return 0;
 }

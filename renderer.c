@@ -27,6 +27,10 @@ void r_init(void) {
   /* init texture */
 }
 
+void r_deinit(void) {
+  fenster_close(&window);
+}
+
 static inline bool within(int c, int lo, int hi) {
   return c >= lo && c < hi;
 }

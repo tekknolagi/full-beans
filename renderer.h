@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 void r_init(void);
+void r_deinit(void);
 void r_draw_rect(mu_Rect rect, mu_Color color);
 void r_draw_text(const char *text, mu_Vec2 pos, mu_Color color);
 void r_draw_icon(int id, mu_Rect rect, mu_Color color);
