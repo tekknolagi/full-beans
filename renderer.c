@@ -185,17 +185,19 @@ void r_present(void) {
   fenster_loop(&window);
 }
 
+int mouse_down = 0;
 
 int r_mouse_down(void) {
-  if (window.mouse == 1) {
-    window.mouse++;
+  if (window.mouse && !mouse_down) {
+    mouse_down = 1;
     return 1;
   }
   return 0;
 }
 
 int r_mouse_up(void) {
-  if (window.mouse < 1) {
+  if (!window.mouse && mouse_down) {
+    mouse_down = 0;
     return 1;
   }
   return 0;
