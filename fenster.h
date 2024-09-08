@@ -333,9 +333,6 @@ int enableRawMode() {
   return 0;
 }
 FENSTER_API int fenster_open(struct fenster *f) {
-  if (enableRawMode() == -1) {
-    return -1;
-  }
   f->fbstate.fd = open("/dev/fb0", O_RDWR);
   if (f->fbstate.fd < 0) {
     perror("Error: cannot open framebuffer device");
@@ -374,6 +371,9 @@ FENSTER_API int fenster_open(struct fenster *f) {
     return -1;
   }
   memcpy(f->fbstate.prev, f->fbstate.screen, f->fbstate.fb_data_size);
+  if (enableRawMode() == -1) {
+    return -1;
+  }
   return 0;
 }
 FENSTER_API int fenster_loop(struct fenster *f) {
@@ -393,10 +393,10 @@ FENSTER_API int fenster_loop(struct fenster *f) {
   return 0;
 }
 FENSTER_API void fenster_close(struct fenster *f) {
+  disableRawMode();
   memcpy(f->fbstate.screen, f->fbstate.prev, f->fbstate.fb_data_size);
   munmap(f->fbstate.screen, f->fbstate.fb_data_size);
   close(f->fbstate.fd);
-  disableRawMode();
 }
 #else
 // clang-format off
