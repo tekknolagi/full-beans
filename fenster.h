@@ -29,6 +29,20 @@
 #include <objc/objc-runtime.h>
 #elif defined(_WIN32)
 #include <windows.h>
+#elif defined(USE_LINUX_FB)
+#define _DEFAULT_SOURCE 1
+#include <fcntl.h>
+#include <linux/fb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <time.h>
+#include <assert.h> // TODO(max): Remove
 #else
 #define _DEFAULT_SOURCE 1
 #include <X11/XKBlib.h>
@@ -46,6 +60,7 @@ struct fenster {
   const int width;
   const int height;
   uint32_t *buf;
+  // TODO(max): Use console raw mode for keys
   int keys[256]; /* keys are mostly ASCII, but arrows are 17..20 */
   int mod;       /* mod is 4 bits mask, ctrl=1, shift=2, alt=4, meta=8 */
   int x;
@@ -55,6 +70,15 @@ struct fenster {
   id wnd;
 #elif defined(_WIN32)
   HWND hwnd;
+#elif defined(USE_LINUX_FB)
+  struct {
+    int fd;
+    char *screen;
+    char *prev;
+    int fbwidth;
+    int fbheight;
+    size_t fb_data_size;
+  } fbstate;
 #else
   Display *dpy;
   Window w;
@@ -277,6 +301,58 @@ FENSTER_API int fenster_loop(struct fenster *f) {
   }
   InvalidateRect(f->hwnd, NULL, TRUE);
   return 0;
+}
+#elif defined(USE_LINUX_FB)
+FENSTER_API int fenster_open(struct fenster *f) {
+  f->fbstate.fd = open("/dev/fb0", O_RDWR);
+  if (f->fbstate.fd < 0) {
+    perror("Error: cannot open framebuffer device");
+    return -1;
+  }
+  struct fb_var_screeninfo vinfo;
+  int result = ioctl(f->fbstate.fd, FBIOGET_VSCREENINFO, &vinfo);
+  if (result) {
+    perror("Error reading screen information");
+    return -1;
+  }
+  // TODO(max): Figure out how to render requested display size instead of just getting vscreeninfo
+  f->fbstate.fbwidth = vinfo.xres;
+  f->fbstate.fbheight = vinfo.yres;
+  int fb_bpp = vinfo.bits_per_pixel;
+  int fb_bytes = fb_bpp / 8;
+  if (fb_bytes != 4) {
+    fprintf(stderr, "Error: only support 32-bit color depth (found %d)\n", fb_bpp);
+    return -1;
+  }
+  f->fbstate.fb_data_size = f->fbstate.fbwidth * f->fbstate.fbheight * fb_bytes;
+  f->fbstate.screen = mmap(0, f->fbstate.fb_data_size, PROT_READ | PROT_WRITE, MAP_SHARED, f->fbstate.fd, (off_t)0);
+  if (f->fbstate.screen == MAP_FAILED) {
+    perror("Could not mmap framebuffer");
+    return -1;
+  }
+  f->fbstate.prev = malloc(f->fbstate.fb_data_size);
+  if (f->fbstate.prev == NULL) {
+    perror("Could not allocate room for previous screen contents");
+    return -1;
+  }
+  memcpy(f->fbstate.prev, f->fbstate.screen, f->fbstate.fb_data_size);
+  return 0;
+}
+FENSTER_API int fenster_loop(struct fenster *f) {
+  if (f->width != f->fbstate.fbwidth || f->height != f->fbstate.fbheight) {
+    fprintf(stderr, "Screen of %dx%d does not match framebuffer of size %dx%d",
+            f->width, f->height,
+            f->fbstate.fbwidth, f->fbstate.fbheight);
+    return -1;
+  }
+  assert(f->width * f->height * 4 == f->fbstate.fb_data_size);
+  memcpy(f->fbstate.screen, f->buf, f->fbstate.fb_data_size);
+  return 0;
+}
+FENSTER_API void fenster_close(struct fenster *f) {
+  memcpy(f->fbstate.screen, f->fbstate.prev, f->fbstate.fb_data_size);
+  munmap(f->fbstate.screen, f->fbstate.fb_data_size);
+  close(f->fbstate.fd);
 }
 #else
 // clang-format off
