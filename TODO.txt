@@ -1,2 +1,4 @@
 * Upstream different mouse handling for macOS in fenster
   * Should set `mouse=` like the other platforms
+* Wayland support
+* Linux FB support
