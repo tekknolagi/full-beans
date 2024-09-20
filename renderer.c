@@ -25,6 +25,7 @@ void r_init(void) {
   fenster_open(&window);
 
   /* init texture */
+  clip_rect = mu_rect(0, 0, window.width, window.height);
 }
 
 static inline bool within(int c, int lo, int hi) {
