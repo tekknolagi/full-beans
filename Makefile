@@ -1,4 +1,4 @@
-CFLAGS ?= -Wall -Wextra -pedantic -std=c99
+CFLAGS ?= -DNDEBUG -O3 -Wall -Wextra -pedantic -std=c99
 LDLIBS = -lm
 SOURCES := main.c renderer.c microui.c
 OBJECTS := $(SOURCES:%.c=%.o)
