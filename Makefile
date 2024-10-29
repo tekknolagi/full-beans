@@ -29,6 +29,6 @@ else
 endif
 
 clean:
-	rm -f main $(OBJECTS) $(DEPS)
+	rm -f main main.exe $(OBJECTS) $(DEPS)
 
 .PHONY: clean
