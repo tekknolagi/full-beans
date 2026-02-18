@@ -28,6 +28,14 @@ void r_init(void) {
   clip_rect = mu_rect(0, 0, window.width, window.height);
 }
 
+void r_close(void){
+    fenster_close(&window);
+}
+
+int r_loop(void) {
+    return fenster_loop(&window);  
+}
+
 static inline bool within(int c, int lo, int hi) {
   return c >= lo && c < hi;
 }

@@ -27,6 +27,9 @@ void r_present(void);
  int r_alt_pressed(void);
  int64_t r_get_time(void);
  void r_sleep(int64_t ms);
+ void r_close(void);
+ int r_loop(void);
+ 
 
 #endif
 
