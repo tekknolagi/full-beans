@@ -228,7 +228,7 @@ int main(int argc, char **argv) {
   int mousex = 0, mousey = 0;
 
   /* main loop */
-  for (;;) {
+  while (r_loop() == 0) {
     int64_t before = r_get_time();
     if (r_mouse_moved(&mousex, &mousey)) {
       mu_input_mousemove(ctx, mousex, mousey);
@@ -286,6 +286,6 @@ int main(int argc, char **argv) {
       r_sleep(sleep_time_ms);
     }
   }
-
+  r_close();
   return 0;
 }
